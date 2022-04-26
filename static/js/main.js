@@ -4,29 +4,20 @@
             id: 1,
             title: "Process A",
             description: "Automated Process",
-            payload: {
-                param: "one",
-            },
         },
         {
             id: 2,
             title: "Process B",
             description: "Automated Process",
-            payload: {
-                param: "one",
-            },
         },
         {
             id: 3,
             title: "Process C",
             description: "Automated Process",
-            payload: {
-                param: "one",
-            },
         },
     ];
 
-    function createProcessCard({ title, description, payload }) {
+    function createProcessCard({ title, description }) {
         const card = document.createElement("div");
         const cardBody = document.createElement("div");
         const cardTitle = document.createElement("h2");
@@ -51,12 +42,12 @@
         cardBody.appendChild(buttonWrapper);
         card.append(cardBody);
 
-        button.onclick = createProcessExecution({ title, payload });
+        button.onclick = createProcessExecution({ title });
 
         return card;
     }
 
-    function createProcessExecution({ title, payload }) {
+    function createProcessExecution({ title }) {
         return function () {
             Swal.fire({
                 title: `Queued execution of "${title}"`,
@@ -64,18 +55,22 @@
                 icon: "info",
                 confirmButtonText: "Cool!",
             });
-            execute(payload);
+            execute();
         };
     }
 
-    function execute(payload) {
+    function execute() {
         return fetch("/execute", {
             method: "POST",
             headers: new Headers({
                 "Content-Type": "application/json",
             }),
-            body: JSON.stringify(payload),
-        }).then((res) => res.json());
+        })
+            .then((res) => res.blob())
+            .then((blob) => {
+                const file = window.URL.createObjectURL(blob);
+                window.location.assign(file);
+            });
     }
 
     function main() {
